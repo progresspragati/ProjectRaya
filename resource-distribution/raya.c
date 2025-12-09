@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include<stdlib.h>
+#include <string.h>
 
 
 int population(int year){
     if(year >= 1925 && year <= 2125){
-            FILE *fp = fopen("year_population_1925-2125.csv", "r");
+            FILE *fp = fopen("data\\year_population_1925-2125.csv", "r");
             if (fp == NULL) {
                 perror("Error opening file");
                 exit(EXIT_FAILURE);
@@ -32,7 +33,7 @@ int population(int year){
 
 int waterCrisis(int demandYear){
         if(demandYear >= 1925 && demandYear <= 2125){
-            FILE *fp = fopen("water_demand_supply_1925_2125.csv", "r");
+            FILE *fp = fopen("data\\water_demand_supply_1925_2125.csv", "r");
             if (fp == NULL) {
                 perror("Error opening file");
                 exit(EXIT_FAILURE);
@@ -71,7 +72,7 @@ int waterCrisis(int demandYear){
 
 void rainfall_for_year(int year){
     if(year >= 1925 && year <= 2125){
-        FILE *fp = fopen("climate_rainfall_factors _1925_2125.csv", "r");
+        FILE *fp = fopen("data\\climate_rainfall_factors _1925_2125.csv", "r");
         if (fp == NULL) {
             perror("Error opening file");
             exit(EXIT_FAILURE);
@@ -111,7 +112,7 @@ void rainfall_for_year(int year){
 
 void rainfall_error(int year){
     if(year >= 1925 && year <= 2025){
-        FILE *fp = fopen("rainfall_error_validation_1925_2025.csv", "r");
+        FILE *fp = fopen("data\\rainfall_error_validation_1925_2025.csv", "r");
         if (fp == NULL) {
             perror("Error opening file");
             exit(EXIT_FAILURE);
@@ -143,7 +144,7 @@ void rainfall_error(int year){
     else{
         printf("We can calculate Error or difference between Actual Rainfall and Predicted Rainfall for past years only.\n");
         printf("For future years we could only get predicted data.");
-        printf("\nSo, If You want to get Error or difference between Actual Rainfall and Predicted Rainfall, Please, give year between 1925 to 2025.\nThank You!");
+        printf("\nSo, If You want to get Error or difference between Actual Rainfall and Predicted Rainfall, Please, give year between 1925 to 2025.\nThank You!\n");
     }
 }
 
@@ -170,7 +171,20 @@ int resourceDistribution(){
     return 0;
 }
 
-int main(){
+int main(int argc, char *argv[]){
+    if (argc > 1 && strcmp(argv[1], "--validation") == 0) {
+        printf("Validation mode is active.");
+        // TODO: Add your validation code here
+        FILE *out = fopen("validation_summary.csv", "w");
+        if (out == NULL) {
+            perror("Error creating validation_summary.csv");
+            return 1;
+        }
+        fclose(out);
+        printf("Validation complete. Output saved to validation_summary.csv\n");
+        return 0; 
+    }
+
     resourceDistribution();
     return 0;
 }

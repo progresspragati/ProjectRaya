@@ -1,7 +1,69 @@
 #include <stdio.h>
-#include<stdlib.h>
+#include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
+
+void validate_rainfall() {
+    FILE *fp = fopen("data\\rainfall_error_validation_1925_2025.csv", "r");
+    if (fp == NULL) {
+        perror("Error opening rainfall_error_validation_1925_2025.csv");
+        exit(EXIT_FAILURE);
+    }
+
+    char line[200];
+    fgets(line, sizeof(line), fp); // skip header
+
+    double mae_sum = 0.0;
+    double mape_sum = 0.0;
+    double rmse_sum = 0.0;
+    int count = 0;
+
+    while (fgets(line, sizeof(line), fp)) {
+        int Year;
+        double Observed, Predicted, ErrorPct;
+
+        if (sscanf(line, "%d,%lf,%lf,%lf", 
+                   &Year, &Observed, &Predicted, &ErrorPct) != 4) {
+            continue;
+        }
+
+        double abs_err = fabs(Observed - Predicted);
+        double pct_err = fabs(abs_err / Observed) * 100;
+
+        mae_sum += abs_err;
+        mape_sum += pct_err;
+        rmse_sum += abs_err * abs_err;
+
+        count++;
+    }
+
+    fclose(fp);
+
+    if (count == 0) {
+        printf("Validation failed: No data found.\n");
+        return;
+    }
+
+    double MAE  = mae_sum / count;
+    double MAPE = mape_sum / count;
+    double RMSE = sqrt(rmse_sum / count);
+
+    FILE *out = fopen("validation_summary.csv", "w");
+    if (out == NULL) {
+        perror("Error writing validation_summary.csv");
+        exit(EXIT_FAILURE);
+    }
+
+    fprintf(out, "Metric,Value\n");
+    fprintf(out, "MAE,%.4lf\n", MAE);
+    fprintf(out, "MAPE,%.4lf\n", MAPE);
+    fprintf(out, "RMSE,%.4lf\n", RMSE);
+
+    fclose(out);
+
+    printf("Validation Complete: MAPE = %.2lf%%\n", MAPE);
+}
 
 int population(int year){
     if(year >= 1925 && year <= 2125){
@@ -173,15 +235,7 @@ int resourceDistribution(){
 
 int main(int argc, char *argv[]){
     if (argc > 1 && strcmp(argv[1], "--validation") == 0) {
-        printf("Validation mode is active.");
-        // TODO: Add your validation code here
-        FILE *out = fopen("validation_summary.csv", "w");
-        if (out == NULL) {
-            perror("Error creating validation_summary.csv");
-            return 1;
-        }
-        fclose(out);
-        printf("Validation complete. Output saved to validation_summary.csv\n");
+        validate_rainfall();
         return 0; 
     }
 

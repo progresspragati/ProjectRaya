@@ -1,6 +1,6 @@
 # Rainfall Prediction Evaluation Report
 
-**Data source:** `/mnt/data/rainfall_error_validation_1925_2025.csv`
+**Data source:** /data/rainfall_error_validation_1925_2025.csv`
 
 ## Overall Metrics
 
